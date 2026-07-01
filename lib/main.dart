@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/l10n/generated/app_localizations.dart';
 import 'core/theme/app_theme.dart';
+import 'features/history/presentation/history_screen.dart';
+import 'features/home/presentation/home_screen.dart';
+import 'features/settings/presentation/settings_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,19 +26,11 @@ class PlateSnapApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      home: const _HomePlaceholder(),
-    );
-  }
-}
-
-/// Temporary placeholder replaced by the real home screen in a later branch.
-class _HomePlaceholder extends StatelessWidget {
-  const _HomePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('PlateSnap')),
+      home: const HomeScreen(),
+      routes: <String, WidgetBuilder>{
+        '/history': (_) => const HistoryScreen(),
+        '/settings': (_) => const SettingsScreen(),
+      },
     );
   }
 }
