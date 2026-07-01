@@ -215,6 +215,15 @@ flutter test                   # tests unitaires + widgets
 flutter test --coverage        # avec couverture (rapport dans coverage/)
 ```
 
+> Note (Linux desktop uniquement) : les tests qui exercent la base de
+> données locale (`drift`/`sqlite3`) nécessitent `libsqlite3` sur la
+> machine hôte. Sur Debian/Ubuntu : `sudo apt-get install libsqlite3-0`,
+> puis, si seule la bibliothèque versionnée (`libsqlite3.so.0`) est
+> présente, les tests concernés utilisent
+> `open.overrideFor(OperatingSystem.linux, ...)` du package `sqlite3`
+> pour la charger explicitement. Sur Android/iOS réels, `sqlite3_flutter_libs`
+> embarque la bibliothèque native : aucune action n'est nécessaire.
+
 ## CI locale
 
 Un script simple regroupant analyse statique + tests est fourni :

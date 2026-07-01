@@ -25,8 +25,10 @@ class ValidationScreen extends StatefulWidget {
   final DraftCapture draft;
 
   /// Called with the final corrected plate text (may equal the detected
-  /// plate, or be empty if none was ever provided).
-  final void Function(String correctedPlate) onSave;
+  /// plate, or be empty if none was ever provided). May throw/report errors
+  /// via a SnackBar using the given context; the screen stays open on
+  /// failure so the user can retry.
+  final Future<void> Function(BuildContext context, String correctedPlate) onSave;
   final VoidCallback onRetake;
   final VoidCallback onCancel;
 
@@ -37,6 +39,7 @@ class ValidationScreen extends StatefulWidget {
 class _ValidationScreenState extends State<ValidationScreen> {
   late final TextEditingController _plateController;
   bool _isEditingPlate = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -50,6 +53,14 @@ class _ValidationScreenState extends State<ValidationScreen> {
   void dispose() {
     _plateController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSave(BuildContext context) async {
+    setState(() => _isSaving = true);
+    await widget.onSave(context, _plateController.text.trim());
+    if (mounted) {
+      setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -100,8 +111,10 @@ class _ValidationScreenState extends State<ValidationScreen> {
           ),
           const SizedBox(height: 12),
           FilledButton.icon(
-            onPressed: () => widget.onSave(_plateController.text.trim()),
-            icon: const Icon(Icons.save),
+            onPressed: _isSaving ? null : () => _handleSave(context),
+            icon: _isSaving
+                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.save),
             label: Text(l10n.validationSave),
             style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
           ),
