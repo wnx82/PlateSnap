@@ -6,6 +6,23 @@ Le projet suit le Semantic Versioning : MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-01
+
+### Added
+
+- Tests unitaires de `PlateRecognitionEngine` : formats belges/français avec et sans tirets, cas `unknown`, nettoyage des espaces/caractères parasites, corrections de confusions OCR, non-sur-correction.
+- Tests unitaires de `CaptureRepositoryImpl` (base SQLite en mémoire) : création/lecture, suppression individuelle et totale, filtre par pays, recherche par plaque, tri, statistiques.
+- Tests widgets : écran d'accueil, écran de validation (plaque détectée, saisie manuelle, enregistrement), écran d'historique (état vide, liste, recherche), écran de détail (affichage, confirmation de suppression, édition).
+- Aides de test partagées (`test/test_helpers/`) : mocks Mocktail des services/repository, wrapper `pumpApp` avec un viewport de test de taille téléphone.
+
+### Changed
+
+- `ValidationScreen` affiche désormais le message "aucune plaque détectée" même lorsque le champ de saisie manuelle est déjà actif (l'affichage précédent masquait ce message dès l'entrée en mode édition automatique).
+
+### Fixed
+
+- Correction d'un import inutilisé détecté par l'analyse statique.
+
 ## [0.7.0] - 2026-07-01
 
 ### Added
