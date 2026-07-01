@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/generated/app_localizations.dart';
-import '../../capture/presentation/capture_screen.dart';
+import '../../capture/presentation/capture_flow.dart';
 
 /// App entry screen: quick actions (new capture, history, settings) and a
 /// summary of the local capture history.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.homeTitle)),
@@ -22,7 +23,7 @@ class HomeScreen extends StatelessWidget {
               const _SummaryCard(),
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: () => _openCapture(context),
+                onPressed: () => openCaptureFlow(context, ref),
                 icon: const Icon(Icons.camera_alt),
                 label: Text(l10n.homeNewCapture),
                 style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18)),
@@ -43,18 +44,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  void _openCapture(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => CaptureScreen(
-          onPhotoConfirmed: (BuildContext ctx, String imagePath) async {
-            Navigator.of(ctx).pop();
-          },
         ),
       ),
     );
