@@ -6,6 +6,22 @@ Le projet suit le Semantic Versioning : MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-01
+
+### Added
+
+- `LocationService` (implémentation `LocationServiceImpl` via `geolocator`) : permission de localisation, statut du service GPS, position ponctuelle (jamais de suivi continu).
+- Permissions de localisation déclarées côté Android (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`) et iOS (`NSLocationWhenInUseUsageDescription`).
+- Entité transitoire `DraftCapture` représentant une capture entre la prise de photo et son enregistrement définitif.
+- Écran de validation (`ValidationScreen`) affichant la photo, la date, l'heure locale et la position GPS (ou un message clair si indisponible/refusée), avec actions "Enregistrer", "Reprendre la photo", "Annuler".
+- Orchestration du flux complet capture → localisation → validation (`capture_flow.dart`), sans logique de navigation dans les écrans eux-mêmes.
+
+### Changed
+
+- `HomeScreen` déclenche désormais le flux de capture complet (caméra puis validation) au lieu de revenir directement à l'accueil.
+
+### Fixed
+
 ## [0.2.0] - 2026-07-01
 
 ### Added
