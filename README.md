@@ -85,7 +85,10 @@ déployer sur un appareil physique.
 
 ```
 lib/
-  core/                 # thème, constantes, erreurs, i18n, routing, utils
+  core/                 # thème, constantes, erreurs, i18n, utils
+                         # (navigation volontairement simple : Navigator +
+                         #  routes nommées dans main.dart, pas de package
+                         #  de routing dédié pour une app de cette taille)
   domain/                # entités et interfaces de service (indépendantes de Flutter/plugins)
     entities/
     services/            # CameraService, LocationService, PlateRecognitionService, ExportService, PrivacyService
