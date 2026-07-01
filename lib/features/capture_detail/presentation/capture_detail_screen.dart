@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/errors/app_exception.dart';
@@ -10,8 +11,10 @@ import '../../../core/l10n/generated/app_localizations.dart';
 import '../../../core/utils/country_label.dart';
 import '../../../core/utils/error_messages.dart';
 import '../../../domain/entities/capture_record.dart';
+import '../../../domain/services/export_service.dart';
 import '../../../presentation/providers/repository_providers.dart';
 import '../../../presentation/providers/service_providers.dart';
+import '../../../presentation/providers/settings_providers.dart';
 import '../../../presentation/widgets/confirm_dialog.dart';
 import '../../../presentation/widgets/country_badge.dart';
 
@@ -127,6 +130,20 @@ class _CaptureDetailScreenState extends ConsumerState<CaptureDetailScreen> {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
+  Future<void> _export() async {
+    final CaptureRecord? current = _record;
+    if (current == null) return;
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    try {
+      final bool blur = ref.read(blurPlateOnExportProvider);
+      final ExportedCapture exported = await ref.read(exportServiceProvider).exportSingle(current, blurPlate: blur);
+      await Share.shareXFiles(<XFile>[XFile(exported.jsonPath), XFile(exported.photoPath)]);
+    } on AppException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appExceptionMessage(l10n, e))));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -154,6 +171,11 @@ class _CaptureDetailScreenState extends ConsumerState<CaptureDetailScreen> {
       appBar: AppBar(
         title: Text(l10n.detailTitle),
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: l10n.detailExport,
+            onPressed: _export,
+          ),
           IconButton(icon: const Icon(Icons.delete_outline), onPressed: _delete),
         ],
       ),

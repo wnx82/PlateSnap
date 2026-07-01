@@ -6,6 +6,21 @@ Le projet suit le Semantic Versioning : MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-01
+
+### Added
+
+- `PrivacyServiceImpl` : préférences de confidentialité persistées localement (intro vue, floutage à l'export, conservation de la photo originale), floutage gaussien on-device d'une zone de la plaque, suppression totale des données (base + fichiers photo/miniatures).
+- `ExportServiceImpl` : export global CSV et JSON de tout l'historique, export d'une capture unique (JSON + photo, floutée si l'option est activée), tous écrits localement puis partagés via la feuille de partage native.
+- Écran de confidentialité (`PrivacyScreen`) accessible depuis les paramètres, et écran d'accueil de confidentialité au premier lancement (`PrivacyOnboardingScreen`), affiché avant tout accès à l'application.
+- Écran Paramètres complet : langue (Système/FR/EN/NL), thème (Système/Clair/Sombre), floutage à l'export, conservation de la photo originale, lien confidentialité, export CSV/JSON global, suppression totale de l'historique (avec confirmation).
+- Bouton "Exporter cette capture" sur l'écran de détail.
+- Comportement réel de "conserver la photo originale" : lorsqu'il est désactivé, seule la miniature est conservée sur disque pour les nouvelles captures.
+
+### Changed
+
+### Fixed
+
 ## [0.6.0] - 2026-07-01
 
 ### Added
