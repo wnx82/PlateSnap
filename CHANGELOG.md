@@ -6,6 +6,20 @@ Le projet suit le Semantic Versioning : MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-01
+
+### Added
+
+- Écran d'accueil (`HomeScreen`) avec les actions "Nouvelle capture", "Historique", "Paramètres" et une carte de résumé.
+- Flux de capture caméra complet (`CaptureScreen`) : demande de permission caméra avec message clair, aperçu caméra live (package `camera`), prise de photo, écran de relecture (reprendre/valider).
+- `CameraService` (implémentation `CameraServiceImpl`) : permissions caméra, persistance des photos capturées dans le stockage local de l'app, génération de miniatures.
+- Permissions caméra déclarées côté Android (`AndroidManifest.xml`) et iOS (`Info.plist` `NSCameraUsageDescription`).
+- Écrans temporaires Historique/Paramètres (finalisés dans des branches ultérieures) pour permettre la navigation complète dès maintenant.
+
+### Changed
+
+### Fixed
+
 ## [0.1.0] - 2026-07-01
 
 ### Added

@@ -5,7 +5,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Platesnap</string>
+	<string>PlateSnap</string>
+	<key>NSCameraUsageDescription</key>
+	<string>PlateSnap a besoin de l'appareil photo pour capturer une plaque d'immatriculation.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

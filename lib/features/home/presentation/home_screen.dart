@@ -1,0 +1,93 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/l10n/generated/app_localizations.dart';
+import '../../capture/presentation/capture_screen.dart';
+
+/// App entry screen: quick actions (new capture, history, settings) and a
+/// summary of the local capture history.
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.homeTitle)),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const _SummaryCard(),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: () => _openCapture(context),
+                icon: const Icon(Icons.camera_alt),
+                label: Text(l10n.homeNewCapture),
+                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18)),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => _openHistory(context),
+                icon: const Icon(Icons.history),
+                label: Text(l10n.homeHistory),
+                style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18)),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => _openSettings(context),
+                icon: const Icon(Icons.settings),
+                label: Text(l10n.homeSettings),
+                style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openCapture(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => CaptureScreen(
+          onPhotoConfirmed: (BuildContext ctx, String imagePath) async {
+            Navigator.of(ctx).pop();
+          },
+        ),
+      ),
+    );
+  }
+
+  void _openHistory(BuildContext context) {
+    Navigator.of(context).pushNamed('/history');
+  }
+
+  void _openSettings(BuildContext context) {
+    Navigator.of(context).pushNamed('/settings');
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(l10n.homeSummaryTitle, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 12),
+            Text(l10n.homeNoCaptureYet, style: Theme.of(context).textTheme.bodyMedium),
+          ],
+        ),
+      ),
+    );
+  }
+}
