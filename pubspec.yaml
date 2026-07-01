@@ -1,0 +1,54 @@
+name: platesnap
+description: "PlateSnap - capture manuelle et reconnaissance locale de plaques d'immatriculation."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Camera & images
+  camera: ^0.11.1
+  image: ^4.3.0
+  path_provider: ^2.1.5
+  permission_handler: ^11.3.1
+
+  # Geolocation
+  geolocator: ^13.0.2
+
+  # OCR on-device
+  google_mlkit_text_recognition: ^0.15.0
+
+  # Local storage
+  drift: ^2.22.1
+  sqlite3_flutter_libs: ^0.5.28
+  path_provider_android: ^2.2.14
+  path: ^1.9.1
+
+  # Utils
+  intl: ^0.20.2
+  uuid: ^4.5.1
+  share_plus: ^10.1.4
+  url_launcher: ^6.3.1
+  csv: ^6.0.0
+  shared_preferences: ^2.3.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  drift_dev: ^2.22.1
+  build_runner: ^2.4.13
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+  generate: true
