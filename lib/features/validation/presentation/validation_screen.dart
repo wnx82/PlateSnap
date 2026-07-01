@@ -3,15 +3,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/l10n/generated/app_localizations.dart';
+import '../../../core/utils/country_label.dart';
 import '../../../domain/entities/draft_capture.dart';
+import '../../../domain/services/plate_recognition_service.dart';
+import '../../../presentation/widgets/country_badge.dart';
 
 /// Lets the user review a freshly captured photo together with its
-/// automatically-collected metadata (date, time, GPS) before it is
-/// persisted. Plate recognition and manual correction are layered on top
-/// of this screen in a later branch, once [DraftCapture.recognition] is
-/// populated.
-class ValidationScreen extends StatelessWidget {
+/// automatically-collected metadata (date, time, GPS, detected plate) and
+/// correct the plate manually before it is persisted.
+class ValidationScreen extends StatefulWidget {
   const ValidationScreen({
     super.key,
     required this.draft,
@@ -21,9 +23,34 @@ class ValidationScreen extends StatelessWidget {
   });
 
   final DraftCapture draft;
-  final VoidCallback onSave;
+
+  /// Called with the final corrected plate text (may equal the detected
+  /// plate, or be empty if none was ever provided).
+  final void Function(String correctedPlate) onSave;
   final VoidCallback onRetake;
   final VoidCallback onCancel;
+
+  @override
+  State<ValidationScreen> createState() => _ValidationScreenState();
+}
+
+class _ValidationScreenState extends State<ValidationScreen> {
+  late final TextEditingController _plateController;
+  bool _isEditingPlate = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final String initial = widget.draft.correctedPlate ?? widget.draft.recognition?.detectedPlate ?? '';
+    _plateController = TextEditingController(text: initial);
+    _isEditingPlate = !widget.draft.hasUsablePlate;
+  }
+
+  @override
+  void dispose() {
+    _plateController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +58,7 @@ class ValidationScreen extends StatelessWidget {
     final String localeName = Localizations.localeOf(context).toString();
     final DateFormat dateFormat = DateFormat.yMMMMd(localeName);
     final DateFormat timeFormat = DateFormat.Hms(localeName);
+    final PlateRecognitionResult? recognition = widget.draft.recognition;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.validationTitle)),
@@ -41,19 +69,21 @@ class ValidationScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: AspectRatio(
               aspectRatio: 4 / 3,
-              child: Image.file(File(draft.imagePath), fit: BoxFit.cover),
+              child: Image.file(File(widget.draft.imagePath), fit: BoxFit.cover),
             ),
           ),
           const SizedBox(height: 16),
-          _InfoTile(icon: Icons.event, label: l10n.validationDate, value: dateFormat.format(draft.capturedAt)),
-          _InfoTile(icon: Icons.access_time, label: l10n.validationTime, value: timeFormat.format(draft.capturedAt)),
-          _LocationTile(draft: draft, l10n: l10n),
+          _buildPlateSection(context, l10n, recognition),
+          const Divider(height: 32),
+          _InfoTile(icon: Icons.event, label: l10n.validationDate, value: dateFormat.format(widget.draft.capturedAt)),
+          _InfoTile(icon: Icons.access_time, label: l10n.validationTime, value: timeFormat.format(widget.draft.capturedAt)),
+          _LocationTile(draft: widget.draft, l10n: l10n),
           const SizedBox(height: 24),
           Row(
             children: <Widget>[
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onRetake,
+                  onPressed: widget.onRetake,
                   icon: const Icon(Icons.replay),
                   label: Text(l10n.validationRetake),
                 ),
@@ -61,7 +91,7 @@ class ValidationScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onCancel,
+                  onPressed: widget.onCancel,
                   icon: const Icon(Icons.close),
                   label: Text(l10n.validationCancel),
                 ),
@@ -70,13 +100,114 @@ class ValidationScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           FilledButton.icon(
-            onPressed: onSave,
+            onPressed: () => widget.onSave(_plateController.text.trim()),
             icon: const Icon(Icons.save),
             label: Text(l10n.validationSave),
             style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPlateSection(BuildContext context, AppLocalizations l10n, PlateRecognitionResult? recognition) {
+    final bool hasAutoPlate = recognition != null && recognition.hasDetectedPlate;
+    final PlateCountry country = recognition?.countryCode ?? PlateCountry.unknown;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Text(l10n.validationDetectedPlate, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(width: 8),
+            CountryBadge(country: country),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (!hasAutoPlate && !_isEditingPlate)
+          Text(l10n.validationNoPlateDetected, style: Theme.of(context).textTheme.bodyMedium),
+        if (_isEditingPlate)
+          TextField(
+            controller: _plateController,
+            autofocus: true,
+            textCapitalization: TextCapitalization.characters,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: l10n.validationDetectedPlate,
+            ),
+            onChanged: (_) => setState(() {}),
+          )
+        else
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  _plateController.text,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => setState(() => _isEditingPlate = true),
+                icon: const Icon(Icons.edit),
+                label: Text(l10n.validationEditPlate),
+              ),
+            ],
+          ),
+        if (hasAutoPlate) ...<Widget>[
+          const SizedBox(height: 4),
+          Text(
+            '${l10n.validationCountry}: ${countryDisplayName(l10n, country)}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          if (recognition.confidence != null)
+            Text(
+              '${l10n.validationConfidence}: ${(recognition.confidence! * 100).toStringAsFixed(0)}%',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+        ],
+        if (recognition != null && recognition.candidates.length > 1) ...<Widget>[
+          const SizedBox(height: 8),
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text(l10n.validationCandidates, style: Theme.of(context).textTheme.bodyMedium),
+            children: recognition.candidates
+                .skip(1)
+                .map(
+                  (PlateCandidate c) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: CountryBadge(country: c.countryCode),
+                    title: Text(c.text),
+                    trailing: Text('${(c.confidence * 100).toStringAsFixed(0)}%'),
+                    onTap: () => setState(() {
+                      _plateController.text = c.text;
+                      _isEditingPlate = false;
+                    }),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+        if (recognition != null) ...<Widget>[
+          const SizedBox(height: 4),
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text(l10n.validationRawOcr, style: Theme.of(context).textTheme.bodyMedium),
+            children: <Widget>[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: SelectableText(
+                    recognition.rawOcrText.isEmpty ? '—' : recognition.rawOcrText,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }

@@ -6,6 +6,26 @@ Le projet suit le Semantic Versioning : MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-01
+
+### Added
+
+- `PlateRecognitionEngine` : moteur pur (sans dépendance Flutter/OCR) de nettoyage OCR et de correspondance de formats, entièrement testable en isolation.
+  - Formats belges modernes : `1-ABC-123` / `2-ABC-123`, variante sans tirets `1ABC123`.
+  - Format français SIV : `AB-123-CD`, variante sans tirets `AB123CD`.
+  - Retourne `unknown` si aucun format ne correspond, en conservant toujours le texte OCR brut.
+  - Nettoyage des espaces/caractères parasites et correction ciblée des confusions OCR fréquentes (`O↔0`, `I↔1`, `B↔8`, `S↔5`, `Z↔2`), appliquée uniquement quand un caractère ne correspond pas au type attendu (chiffre/lettre) de sa position, pour éviter toute sur-correction.
+- `PlateRecognitionServiceImpl` : reconnaissance de texte on-device via `google_mlkit_text_recognition` (aucun appel réseau), déléguant l'analyse au moteur pur ci-dessus.
+- Écran d'analyse transitoire (`AnalyzingScreen`) exécutant en parallèle la localisation GPS et la reconnaissance de plaque après confirmation de la photo.
+- Écran de validation enrichi : plaque détectée, badge pays, score de confiance, candidats alternatifs, texte OCR brut consultable, et correction manuelle complète de la plaque avant enregistrement.
+- Widget partagé `CountryBadge` (BE/FR/Inconnu) réutilisable dans l'historique et le détail.
+
+### Changed
+
+- Le flux de capture inclut désormais l'étape d'analyse (localisation + OCR) avant d'afficher l'écran de validation.
+
+### Fixed
+
 ## [0.3.0] - 2026-07-01
 
 ### Added

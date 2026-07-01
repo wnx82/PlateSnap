@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/generated/app_localizations.dart';
 import '../../capture/presentation/capture_flow.dart';
 
 /// App entry screen: quick actions (new capture, history, settings) and a
 /// summary of the local capture history.
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.homeTitle)),
@@ -23,7 +22,7 @@ class HomeScreen extends ConsumerWidget {
               const _SummaryCard(),
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: () => openCaptureFlow(context, ref),
+                onPressed: () => openCaptureFlow(context),
                 icon: const Icon(Icons.camera_alt),
                 label: Text(l10n.homeNewCapture),
                 style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18)),
