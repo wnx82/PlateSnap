@@ -138,8 +138,10 @@ class _ValidationScreenState extends State<ValidationScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        if (!hasAutoPlate && !_isEditingPlate)
+        if (!hasAutoPlate) ...<Widget>[
           Text(l10n.validationNoPlateDetected, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: 8),
+        ],
         if (_isEditingPlate)
           TextField(
             controller: _plateController,
