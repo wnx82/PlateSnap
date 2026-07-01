@@ -6,6 +6,19 @@ Le projet suit le Semantic Versioning : MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-01
+
+### Added
+
+- Écran Historique complet : recherche par plaque, filtre par pays (BE/FR/Autre/Tous), filtre par date, tri du plus récent au plus ancien (par défaut), suppression individuelle avec confirmation, état vide dédié.
+- Widget `CaptureCard` : miniature, plaque, badge pays, date/heure, coordonnées GPS.
+- Écran de détail d'une capture (`CaptureDetailScreen`) : photo, plaque détectée/corrigée, pays, date/heure, GPS et précision, note libre éditable, bouton "Ouvrir dans Maps", modification et suppression (avec nettoyage des fichiers photo/miniature).
+- Dialogue de confirmation partagé (`showConfirmDialog`) réutilisé pour toutes les suppressions.
+
+### Changed
+
+### Fixed
+
 ## [0.5.0] - 2026-07-01
 
 ### Added
