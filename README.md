@@ -215,6 +215,24 @@ flutter test                   # tests unitaires + widgets
 flutter test --coverage        # avec couverture (rapport dans coverage/)
 ```
 
+Couverture actuelle (`test/`) :
+
+- `test/unit/plate_recognition_engine_test.dart` — formats belges/français avec et sans tirets, cas `unknown`, nettoyage des espaces/caractères parasites, corrections de confusions OCR, non-sur-correction.
+- `test/unit/capture_repository_test.dart` — création/lecture, suppression individuelle et totale, filtre par pays, recherche par plaque, tri du plus récent au plus ancien, statistiques.
+- `test/widget/home_screen_test.dart` — actions principales et résumé.
+- `test/widget/validation_screen_test.dart` — plaque détectée, saisie manuelle quand rien n'est détecté, enregistrement.
+- `test/widget/history_screen_test.dart` — état vide, liste des captures, recherche.
+- `test/widget/capture_detail_screen_test.dart` — affichage, confirmation avant suppression, édition de la plaque.
+- `test/test_helpers/` — mocks Mocktail des services/repository et un utilitaire `pumpApp` (voir note ci-dessous sur la taille du viewport de test).
+
+> Astuce (widgets avec photo) : les écrans qui affichent une photo dans une
+> liste défilante peuvent dépasser la taille par défaut du viewport de test
+> (800×600), ce qui fait que `find.text`/`find.byType` (qui ignorent par
+> défaut le contenu hors écran) ne trouvent pas un widget pourtant bien
+> présent. `test/test_helpers/pump_app.dart` configure un viewport de
+> taille téléphone (1080×2400) pour éviter ce piège ; réutilisez `pumpApp`
+> plutôt que `tester.pumpWidget` direct pour tout nouvel écran avec photo.
+
 > Note (Linux desktop uniquement) : les tests qui exercent la base de
 > données locale (`drift`/`sqlite3`) nécessitent `libsqlite3` sur la
 > machine hôte. Sur Debian/Ubuntu : `sudo apt-get install libsqlite3-0`,
