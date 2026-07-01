@@ -6,6 +6,22 @@ Le projet suit le Semantic Versioning : MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-01
+
+### Added
+
+- Base de données SQLite locale via `drift` (`AppDatabase`, table `capture_records`), stockée dans le répertoire de documents privé de l'application.
+- `CaptureRepositoryImpl` : création, lecture, mise à jour, suppression (unitaire et totale), recherche par plaque, filtre par pays/date, statistiques agrégées (`watchStats`), le tout en flux réactifs (`Stream`) pour l'UI.
+- Persistance réelle du flux de capture : à l'enregistrement, la miniature est générée puis la capture (photo, plaque, pays, confiance, GPS, date/heure) est écrite en base.
+- Carte de résumé de l'accueil connectée aux statistiques réelles (nombre total de captures, dernière capture, confiance OCR moyenne).
+- `AppDatabase.withExecutor` pour permettre l'injection d'une base en mémoire dans les tests (branche tests à venir).
+
+### Changed
+
+- `HomeScreen` redevient réactif (Riverpod) pour afficher les statistiques en direct.
+
+### Fixed
+
 ## [0.4.0] - 2026-07-01
 
 ### Added
