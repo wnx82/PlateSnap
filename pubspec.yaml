@@ -1,7 +1,7 @@
 name: platesnap
 description: "PlateSnap - capture manuelle et reconnaissance locale de plaques d'immatriculation."
 publish_to: 'none'
-version: 0.6.0
+version: 0.7.0
 
 environment:
   sdk: ^3.9.2

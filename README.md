@@ -145,7 +145,7 @@ les appelants (voir Roadmap).
 - Dépend fortement de la qualité de la photo (lumière, angle, flou, plaque sale ou partiellement masquée).
 - Les formats autres que BE/FR modernes sont gérés en best-effort et peuvent être retournés comme `unknown`.
 - Les anciens formats de plaques belges/français ne sont pas couverts en V1.
-- Le score de confiance est heuristique (issu de l'OCR et de la qualité du match de format), pas une probabilité calibrée.
+- Le score de confiance est purement heuristique (basé sur la qualité du match de format, voir Hypothèses techniques), pas une probabilité calibrée issue de l'OCR.
 - **La correction manuelle reste indispensable avant tout usage sensible du résultat.**
 
 ## Confidentialité
@@ -266,10 +266,13 @@ Ce projet ayant été généré de façon autonome, les hypothèses suivantes on
 - **Format français SIV** : `AB-123-CD` (deux lettres, trois chiffres,
   deux lettres), en vigueur depuis 2009 ; l'ancien format FNI
   (`123 ABC 75`) n'est pas couvert en V1.
-- **Score de confiance** : calculé comme une combinaison simple de la
-  confiance moyenne des blocs OCR ML Kit et d'un bonus si le texte
-  correspond exactement à un format connu ; ce n'est pas une probabilité
-  calibrée statistiquement.
+- **Score de confiance** : `google_mlkit_text_recognition` n'expose pas de
+  confiance fiable par caractère sur toutes les plateformes ; le score
+  retourné est donc purement heuristique, basé sur le moteur de formats
+  (`PlateRecognitionEngine`) : une correspondance stricte avec tirets vaut
+  0.95, sans tirets 0.85, et chaque correction de confusion OCR appliquée
+  (`O↔0`, etc.) réduit ce score de 0.10 (plancher 0.5). Ce n'est pas une
+  probabilité calibrée statistiquement.
 - **Reverse geocoding** : non inclus en V1 (nécessiterait soit un service
   cloud, soit une base de données offline volumineuse) ; l'historique
   affiche latitude/longitude, avec un lien direct vers Maps.
@@ -283,6 +286,20 @@ Ce projet ayant été généré de façon autonome, les hypothèses suivantes on
   plaque), au prix d'une intégration légèrement plus complexe.
 - **Aucun compte utilisateur** n'est requis ni proposé en V1, cohérent
   avec l'exigence "aucune synchronisation cloud automatique".
+- **Floutage de la plaque à l'export** : la position exacte de la plaque
+  dans l'image n'est pas conservée par le pipeline OCR actuel (ML Kit ne
+  garantit pas un bloc de texte unique et fiable pour la plaque). Le
+  floutage (`PrivacyService.blurPlateRegion`) applique donc un flou
+  gaussien sur une zone heuristique du bas-centre de la photo (l'endroit
+  où la plaque se trouve le plus souvent), plutôt que sur une zone
+  détectée précisément. L'interface prévoit néanmoins un paramètre
+  `PlateBoundingBox` optionnel pour un floutage précis, dès qu'une
+  détection de zone fiable sera disponible (voir Roadmap).
+- **Option "conserver la photo originale"** : interprétée comme un
+  réglage de stockage local (et non d'export) — lorsqu'elle est
+  désactivée, seule une copie compacte (la miniature) est conservée sur
+  disque pour les nouvelles captures, la photo pleine résolution étant
+  supprimée immédiatement après la génération de la miniature.
 
 ## Licence
 

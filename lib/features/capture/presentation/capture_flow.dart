@@ -12,6 +12,7 @@ import '../../../domain/repositories/capture_repository.dart';
 import '../../../domain/services/camera_service.dart';
 import '../../../presentation/providers/repository_providers.dart';
 import '../../../presentation/providers/service_providers.dart';
+import '../../../presentation/providers/settings_providers.dart';
 import '../../validation/presentation/validation_screen.dart';
 import 'analyzing_screen.dart';
 import 'capture_screen.dart';
@@ -90,6 +91,15 @@ Future<void> _saveCapture(
     final CaptureRepository repository = ref.read(captureRepositoryProvider);
     final String thumbnailPath = await cameraService.generateThumbnail(draft.imagePath);
 
+    // "Conserver la photo originale": when disabled, drop the full-resolution
+    // capture right away and keep only the compact thumbnail on disk.
+    final bool keepOriginal = ref.read(keepOriginalPhotoProvider);
+    String finalImagePath = draft.imagePath;
+    if (!keepOriginal) {
+      await cameraService.deleteImage(imagePath: draft.imagePath);
+      finalImagePath = thumbnailPath;
+    }
+
     final String? detectedPlate = draft.recognition?.detectedPlate;
     final String? finalCorrection =
         (correctedPlate.isEmpty || correctedPlate == detectedPlate) ? null : correctedPlate;
@@ -97,7 +107,7 @@ Future<void> _saveCapture(
     final DateTime now = DateTime.now();
     final CaptureRecord record = CaptureRecord(
       id: const Uuid().v4(),
-      imagePath: draft.imagePath,
+      imagePath: finalImagePath,
       thumbnailPath: thumbnailPath,
       detectedPlate: detectedPlate ?? '',
       correctedPlate: finalCorrection,
